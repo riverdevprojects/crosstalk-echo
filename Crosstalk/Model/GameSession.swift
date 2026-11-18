@@ -19,7 +19,6 @@ final class GameSession: ObservableObject {
     @Published private(set) var scores: [Int] = [0, 0]
     @Published private(set) var revealed: Set<Player.ID> = []
     @Published private(set) var hintNumber = 0
-    @Published private(set) var roundsPlayed = 0
 
     private var usedWords: Set<String> = []
     private var rng: any RandomNumberGenerator
@@ -33,12 +32,6 @@ final class GameSession: ObservableObject {
     }
 
     var currentHint: HintTurn { round.hintTurn(hintNumber) }
-
-    /// Team whose cards are currently being revealed, if any.
-    var revealingTeam: Team? {
-        if case let .reveal(index) = phase { return teams[index] }
-        return nil
-    }
 
     func hasRevealed(_ player: Player) -> Bool { revealed.contains(player.id) }
 
@@ -73,7 +66,6 @@ final class GameSession: ObservableObject {
     func recordWinner(_ teamIndex: Int?) {
         guard phase == .pickWinner else { return }
         if let teamIndex { scores[teamIndex] += 1 }
-        roundsPlayed += 1
         phase = .results(winner: teamIndex)
     }
 

@@ -49,7 +49,7 @@ private struct ThemeRow: View {
             if isSelected {
                 Image(systemName: "checkmark")
                     .font(.body.weight(.semibold))
-                    .accessibilityLabel("Selected")
+                    .accessibilityHidden(true) // the row already carries the selected trait
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

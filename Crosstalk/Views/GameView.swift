@@ -123,6 +123,10 @@ struct CardView: View {
     let card: Card
     let onHide: () -> Void
 
+    /// The app switcher snapshots whatever is on screen. Hide the card's
+    /// contents whenever the app isn't active so the word can't leak there.
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some View {
         VStack(spacing: Style.gap) {
             Text(name)
@@ -133,24 +137,30 @@ struct CardView: View {
             Spacer()
 
             VStack(spacing: Style.gap) {
-                switch card {
-                case let .word(word):
-                    Text("Your word is")
+                if scenePhase != .active {
+                    Text("Hidden")
                         .font(Style.body)
                         .foregroundStyle(Style.muted)
-                    Text(WordDisplay.format(word))
-                        .font(Style.display)
-                        .multilineTextAlignment(.center)
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(2)
-                case let .echo(themeName):
-                    Text("You are the Echo")
-                        .font(Style.display)
-                        .multilineTextAlignment(.center)
-                        .minimumScaleFactor(0.5)
-                    Text(themeName.map { "Theme: \($0)" } ?? "No theme. Good luck.")
-                        .font(Style.body)
-                        .foregroundStyle(Style.muted)
+                } else {
+                    switch card {
+                    case let .word(word):
+                        Text("Your word is")
+                            .font(Style.body)
+                            .foregroundStyle(Style.muted)
+                        Text(WordDisplay.format(word))
+                            .font(Style.display)
+                            .multilineTextAlignment(.center)
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(2)
+                    case let .echo(themeName):
+                        Text("You are the Echo")
+                            .font(Style.display)
+                            .multilineTextAlignment(.center)
+                            .minimumScaleFactor(0.5)
+                        Text(themeName.map { "Theme: \($0)" } ?? "No theme. Good luck.")
+                            .font(Style.body)
+                            .foregroundStyle(Style.muted)
+                    }
                 }
             }
             .padding(.vertical, Style.screenMargin * 2)

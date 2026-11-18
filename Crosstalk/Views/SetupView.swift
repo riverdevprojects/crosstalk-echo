@@ -97,9 +97,18 @@ struct SetupView: View {
                     .focused($nameFieldFocused)
                     .onSubmit(add)
                     .disabled(isFull)
+                    .onChange(of: newName) { value in
+                        if value.count > GameRules.maxNameLength {
+                            newName = String(value.prefix(GameRules.maxNameLength))
+                        }
+                    }
                 Button("Add", action: add)
                     .font(Style.headline)
                     .foregroundStyle(Style.ink)
+                    // 44pt touch target without making the box any taller.
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
+                    .padding(.vertical, -10)
                     .disabled(!canAdd)
                     .opacity(canAdd ? 1 : 0.35)
             }
@@ -126,7 +135,12 @@ struct SetupView: View {
                 .padding(.top, Style.gap)
             ForEach(templates.templates) { template in
                 Button {
-                    app.draftPlayers = template.playerNames.map { Player(name: $0) }
+                    // Trim to the name limit before de-duplicating, so two long
+                    // names can't collapse into the same short one.
+                    let names = template.playerNames.map { String($0.prefix(GameRules.maxNameLength)) }
+                    app.draftPlayers = GameEngine.cleanNames(names)
+                        .prefix(GameRules.maxPlayers)
+                        .map { Player(name: $0) }
                 } label: {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(template.name).font(Style.headline)

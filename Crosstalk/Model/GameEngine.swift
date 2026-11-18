@@ -5,6 +5,8 @@ enum GameRules {
     static let minPlayers = 4
     static let maxPlayers = 20
     static let guessesPerEcho = 2
+    /// Long enough for any real name; short enough to fit the big hint screen.
+    static let maxNameLength = 20
 }
 
 /// What a player sees when they tap their name.
