@@ -41,6 +41,27 @@ enum Style {
     static let gap: CGFloat = 12
     static let screenMargin: CGFloat = 24
     static let buttonHeight: CGFloat = 56
+    /// Between a label and the line just under it.
+    static let tightGap: CGFloat = 6
+    /// Between lines inside one small group.
+    static let hairGap: CGFloat = 4
+    /// Apple's minimum tap size. Small controls get at least this much
+    /// tappable area, even when they look smaller.
+    static let minTouchTarget: CGFloat = 44
+
+    // MARK: State and motion
+
+    static let disabledOpacity: Double = 0.35
+    /// Names that have already seen their card.
+    static let seenOpacity: Double = 0.5
+    static let pressedOpacity: Double = 0.7
+    /// Screen and phase changes crossfade.
+    static let fade = Animation.easeInOut(duration: 0.2)
+
+    // MARK: Icons (SF Symbols)
+
+    static let icon = Font.body.weight(.semibold)
+    static let smallIcon = Font.footnote.weight(.semibold)
 }
 
 // MARK: - Rounded box
@@ -102,7 +123,7 @@ struct BoxButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: Style.radius, style: .continuous)
                     .fill(kind == .primary ? Style.ink : Style.box)
             )
-            .opacity(isEnabled ? (configuration.isPressed ? 0.7 : 1) : 0.35)
+            .opacity(isEnabled ? (configuration.isPressed ? Style.pressedOpacity : 1) : Style.disabledOpacity)
             .contentShape(RoundedRectangle(cornerRadius: Style.radius, style: .continuous))
     }
 }
@@ -118,7 +139,7 @@ struct TextLinkStyle: ButtonStyle {
         configuration.label
             .font(Style.body)
             .foregroundStyle(Style.muted)
-            .frame(minWidth: 44, minHeight: 44, alignment: .leading)
+            .frame(minWidth: Style.minTouchTarget, minHeight: Style.minTouchTarget, alignment: .leading)
             .contentShape(Rectangle())
             .opacity(configuration.isPressed ? 0.5 : 1)
     }

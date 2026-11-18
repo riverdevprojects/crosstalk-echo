@@ -28,7 +28,12 @@ final class ScreenSnapshotTests: XCTestCase {
         return GameSession(players: names.map { Player(name: $0) }, theme: theme, rng: SeededRNG(seed: 42))
     }
 
-    private func render<V: View>(_ name: String, dark: Bool = false, @ViewBuilder _ view: () -> V) throws {
+    private func render<V: View>(
+        _ name: String,
+        dark: Bool = false,
+        textSize: DynamicTypeSize = .large,
+        @ViewBuilder _ view: () -> V
+    ) throws {
         let app = AppModel()
         app.draftPlayers = ["Alex", "Bea", "Cam"].map { Player(name: $0) }
         let themes = ThemeStore(defaults: UserDefaults(suiteName: "snap-\(UUID())")!)
@@ -40,9 +45,11 @@ final class ScreenSnapshotTests: XCTestCase {
                 .environmentObject(app)
                 .environmentObject(themes)
                 .environmentObject(templates)
+                .environment(\.dynamicTypeSize, textSize)
             let image = try snapshot(content, size: size, dark: dark)
             let data = try XCTUnwrap(image.pngData())
-            try data.write(to: outputDir.appendingPathComponent("\(name)-\(device)\(dark ? "-dark" : "").png"))
+            let suffix = (dark ? "-dark" : "") + (textSize == .large ? "" : "-\(textSize)")
+            try data.write(to: outputDir.appendingPathComponent("\(name)-\(device)\(suffix).png"))
         }
     }
 
@@ -101,5 +108,27 @@ final class ScreenSnapshotTests: XCTestCase {
         try render("12-who-said-it") { GameView(session: s) }
         s.recordWinner(0)
         try render("13-results") { GameView(session: s) }
+    }
+
+    /// Worst case for the screens that don't scroll: 20 players with
+    /// 20-character names, at the largest text size the app allows.
+    func testRenderStressScreens() throws {
+        let big = DynamicTypeSize.xxxLarge
+        let names = (1...GameRules.maxPlayers).map { i in
+            String("Maximilian Featherstonehaugh \(i)".prefix(GameRules.maxNameLength))
+        }
+        let theme = ThemeStore.loadBundledThemes(bundle: Bundle(for: GameSession.self)).first { $0.id == "pirate" }!
+        let s = GameSession(players: names.map { Player(name: $0) }, theme: theme, rng: SeededRNG(seed: 7))
+
+        try render("20-stress-home", textSize: big) { HomeView() }
+        try render("21-stress-reveal", textSize: big) { GameView(session: s) }
+        try render("22-stress-card-echo", textSize: big) { CardView(name: names[0], card: .echo(themeName: "Movies & TV")) {} }
+        try render("23-stress-card-word", textSize: big) { CardView(name: names[0], card: .word("tug of war")) {} }
+        for p in s.teams.flatMap(\.players) { s.markRevealed(p) }
+        try render("24-stress-hint", textSize: big) { GameView(session: s) }
+        s.exitRound()
+        try render("25-stress-who-said-it", textSize: big) { GameView(session: s) }
+        s.recordWinner(1)
+        try render("26-stress-results", textSize: big) { GameView(session: s) }
     }
 }

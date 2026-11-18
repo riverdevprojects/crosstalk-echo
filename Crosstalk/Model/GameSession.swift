@@ -69,8 +69,10 @@ final class GameSession: ObservableObject {
         phase = .results(winner: teamIndex)
     }
 
-    /// Same teams, new word, re-picked Echos. Score carries over.
+    /// Same teams, new word, re-picked Echos. Score carries over. Only works
+    /// from the results screen, so a double tap can't use up a second word.
     func playAgain(theme: WordTheme) {
+        guard case .results = phase else { return }
         var generator = AnyRNG(rng)
         round = GameEngine.makeRound(teams: teams, theme: theme, usedWords: usedWords, using: &generator)
         rng = generator.base

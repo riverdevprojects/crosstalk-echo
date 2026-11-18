@@ -87,7 +87,7 @@ struct SetupView: View {
     }
 
     private var addField: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: Style.tightGap) {
             HStack(spacing: Style.gap) {
                 TextField("Add a name", text: $newName)
                     .font(Style.body)
@@ -106,11 +106,11 @@ struct SetupView: View {
                     .font(Style.headline)
                     .foregroundStyle(Style.ink)
                     // 44pt touch target without making the box any taller.
-                    .frame(minWidth: 44, minHeight: 44)
+                    .frame(minWidth: Style.minTouchTarget, minHeight: Style.minTouchTarget)
                     .contentShape(Rectangle())
                     .padding(.vertical, -10)
                     .disabled(!canAdd)
-                    .opacity(canAdd ? 1 : 0.35)
+                    .opacity(canAdd ? 1 : Style.disabledOpacity)
             }
             .box()
 
@@ -118,12 +118,12 @@ struct SetupView: View {
                 Text("\(trimmedNewName) is already playing.")
                     .font(Style.caption)
                     .foregroundStyle(Style.muted)
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, Style.hairGap)
             } else if isFull {
                 Text("That's the maximum of \(GameRules.maxPlayers) players.")
                     .font(Style.caption)
                     .foregroundStyle(Style.muted)
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, Style.hairGap)
             }
         }
     }
@@ -142,7 +142,7 @@ struct SetupView: View {
                         .prefix(GameRules.maxPlayers)
                         .map { Player(name: $0) }
                 } label: {
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: Style.hairGap) {
                         Text(template.name).font(Style.headline)
                         Text(template.playerNames.joined(separator: ", "))
                             .font(Style.caption)
@@ -161,7 +161,9 @@ struct SetupView: View {
                         Label("Delete party", systemImage: "trash")
                     }
                 }
-                .accessibilityHint("Loads these names. Touch and hold to delete.")
+                .accessibilityHint("Loads these names.")
+                // VoiceOver users reach Delete from the actions rotor.
+                .accessibilityAction(named: "Delete party") { templates.delete(template) }
             }
         }
     }
@@ -188,9 +190,9 @@ private struct PlayerRow: View {
             Spacer()
             Button(action: onRemove) {
                 Image(systemName: "xmark")
-                    .font(.footnote.weight(.semibold))
+                    .font(Style.smallIcon)
                     .foregroundStyle(Style.muted)
-                    .frame(width: 44, height: 44)
+                    .frame(width: Style.minTouchTarget, height: Style.minTouchTarget)
                     .contentShape(Rectangle())
             }
             .accessibilityLabel("Remove \(name)")

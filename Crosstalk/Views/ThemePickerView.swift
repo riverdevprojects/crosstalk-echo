@@ -37,7 +37,7 @@ private struct ThemeRow: View {
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Style.hairGap) {
                 Text(theme.name).font(Style.headline)
                 Text(theme.showsNameToEcho
                      ? "\(theme.cleanWords.count) words"
@@ -48,7 +48,7 @@ private struct ThemeRow: View {
             Spacer()
             if isSelected {
                 Image(systemName: "checkmark")
-                    .font(.body.weight(.semibold))
+                    .font(Style.icon)
                     .accessibilityHidden(true) // the row already carries the selected trait
             }
         }
@@ -75,6 +75,6 @@ struct TopBar: View {
                 Button(trailing.0, action: trailing.1).buttonStyle(.textLink)
             }
         }
-        .frame(minHeight: 44)
+        .frame(minHeight: Style.minTouchTarget)
     }
 }

@@ -34,11 +34,14 @@ struct GameView: View {
             .transition(.opacity)
         }
         .screen()
-        .animation(.easeInOut(duration: 0.2), value: session.phase)
+        .animation(Style.fade, value: session.phase)
         // Nobody touches the phone while hints are being talked through, so
         // keep the screen from auto-locking for the length of a game.
         .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
+        // The game moves on by itself (Team 2's turn, hinting); tell
+        // VoiceOver the screen changed so it reads the new one.
+        .onChange(of: session.phase) { _ in VoiceOver.screenChanged() }
         .confirmationDialog("End this game?", isPresented: $confirmingQuit, titleVisibility: .visible) {
             Button("End game", role: .destructive) { app.goHome() }
             Button("Keep playing", role: .cancel) {}
@@ -50,6 +53,28 @@ struct GameView: View {
     private var isResults: Bool {
         if case .results = session.phase { return true }
         return false
+    }
+}
+
+/// VoiceOver doesn't notice when a screen is replaced in place or when Done
+/// swaps the hinter's name, so these say it out loud.
+enum VoiceOver {
+    /// Wait for the new content to appear, and don't talk over VoiceOver's
+    /// own feedback for the button that was just tapped.
+    private static let delay: TimeInterval = 0.3
+
+    static func screenChanged() {
+        guard UIAccessibility.isVoiceOverRunning else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            UIAccessibility.post(notification: .screenChanged, argument: nil)
+        }
+    }
+
+    static func announce(_ text: String) {
+        guard UIAccessibility.isVoiceOverRunning else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            UIAccessibility.post(notification: .announcement, argument: text)
+        }
     }
 }
 
@@ -66,7 +91,7 @@ struct RevealView: View {
 
     var body: some View {
         VStack(spacing: Style.gap) {
-            VStack(spacing: 6) {
+            VStack(spacing: Style.tightGap) {
                 Text(team.name).font(Style.title)
                 Text("Pass the phone around. Tap your name to see your card.")
                     .font(Style.caption)
@@ -87,7 +112,7 @@ struct RevealView: View {
                                 Spacer()
                                 if done {
                                     Image(systemName: "checkmark")
-                                        .font(.body.weight(.semibold))
+                                        .font(Style.icon)
                                         .foregroundStyle(Style.muted)
                                 }
                             }
@@ -96,8 +121,10 @@ struct RevealView: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(done)
-                        .opacity(done ? 0.5 : 1)
-                        .accessibilityLabel(done ? "\(player.name), seen" : "\(player.name), tap to see your card")
+                        .opacity(done ? Style.seenOpacity : 1)
+                        .accessibilityLabel(player.name)
+                        .accessibilityValue(done ? "Seen" : "")
+                        .accessibilityHint(done ? "" : "Shows your card.")
                     }
                 }
                 .padding(.bottom, Style.screenMargin)
@@ -198,6 +225,16 @@ struct HintView: View {
         guard now.timeIntervalSince(lastDoneTap) >= Self.doneCooldown else { return }
         lastDoneTap = now
         session.nextHint()
+        // Done stays focused while the name above it changes in place.
+        VoiceOver.announce(Self.spoken(session.currentHint))
+    }
+
+    private static func heading(_ turn: HintTurn) -> String {
+        turn.number == 0 ? "First hint" : "Hint \(turn.number + 1)"
+    }
+
+    private static func spoken(_ turn: HintTurn) -> String {
+        "\(heading(turn)): \(turn.player.name), \(turn.team.name)"
     }
 
     var body: some View {
@@ -208,8 +245,8 @@ struct HintView: View {
         VStack(spacing: Style.gap) {
             Spacer()
 
-            VStack(spacing: 6) {
-                Text(turn.number == 0 ? "First hint" : "Hint \(turn.number + 1)")
+            VStack(spacing: Style.tightGap) {
+                Text(Self.heading(turn))
                     .font(Style.body)
                     .foregroundStyle(Style.muted)
                 Text(turn.player.name)
@@ -222,13 +259,13 @@ struct HintView: View {
                     .foregroundStyle(Style.muted)
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(turn.number == 0 ? "First hint" : "Hint \(turn.number + 1)"): \(turn.player.name), \(turn.team.name)")
+            .accessibilityLabel(Self.spoken(turn))
             .id(turn.number)
             .transition(.opacity)
 
             Spacer()
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: Style.tightGap) {
                 Text("Then guessing")
                     .font(Style.headline)
                 Text("\(round.echo(of: otherTeam).name) (\(otherTeam.name)) guesses first. If they pass, \(round.echo(of: turn.team).name) (\(turn.team.name)) guesses. Up to \(GameRules.guessesPerEcho) guesses each.")
@@ -250,7 +287,7 @@ struct HintView: View {
                 .foregroundStyle(Style.muted)
                 .padding(.bottom, Style.gap)
         }
-        .animation(.easeInOut(duration: 0.2), value: turn.number)
+        .animation(Style.fade, value: turn.number)
     }
 }
 
@@ -303,7 +340,7 @@ struct ResultsView: View {
         VStack(spacing: Style.gap) {
             Spacer()
 
-            VStack(spacing: 6) {
+            VStack(spacing: Style.tightGap) {
                 Text("The word was")
                     .font(Style.body)
                     .foregroundStyle(Style.muted)
@@ -321,7 +358,7 @@ struct ResultsView: View {
 
             HStack(spacing: Style.gap) {
                 ForEach(session.teams) { team in
-                    VStack(spacing: 4) {
+                    VStack(spacing: Style.hairGap) {
                         Text(team.name)
                             .font(Style.caption)
                             .foregroundStyle(Style.muted)

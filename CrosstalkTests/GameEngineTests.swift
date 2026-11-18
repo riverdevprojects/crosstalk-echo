@@ -173,6 +173,21 @@ final class GameEngineTests: XCTestCase {
         XCTAssertTrue(session.revealed.isEmpty)
         XCTAssertEqual(session.hintNumber, 0)
         XCTAssertNotEqual(session.round.word, firstWord)
+
+        // A second tap on Play again (now mid-reveal) is ignored.
+        let secondWord = session.round.word
+        session.markRevealed(teams[0].players[0])
+        session.playAgain(theme: theme)
+        XCTAssertEqual(session.round.word, secondWord)
+        XCTAssertEqual(session.revealed.count, 1)
+    }
+
+    func testPlayAgainOnlyWorksFromResults() {
+        let session = GameSession(players: players(4), theme: theme, rng: SeededRNG(seed: 8))
+        let word = session.round.word
+        session.playAgain(theme: theme)
+        XCTAssertEqual(session.round.word, word)
+        XCTAssertEqual(session.phase, .reveal(teamIndex: 0))
     }
 
     func testNoWinnerDoesNotScore() {

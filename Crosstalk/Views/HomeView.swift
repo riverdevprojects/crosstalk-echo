@@ -63,7 +63,7 @@ struct RulesView: View {
                         .font(Style.title)
                         .padding(.bottom, Style.gap)
                     ForEach(rules) { rule in
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: Style.tightGap) {
                             Text(rule.title).font(Style.headline)
                             Text(rule.text)
                                 .fixedSize(horizontal: false, vertical: true)
