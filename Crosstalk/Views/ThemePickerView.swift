@@ -8,7 +8,7 @@ struct ThemePickerView: View {
         VStack(spacing: 0) {
             TopBar(leading: ("Back", { app.screen = .home }))
 
-            ScrollView {
+            Scrolling {
                 VStack(spacing: Style.gap) {
                     Text("Theme")
                         .font(Style.title)

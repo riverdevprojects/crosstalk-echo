@@ -42,6 +42,7 @@ final class ScreenSnapshotTests: XCTestCase {
                 .environmentObject(templates)
                 .frame(width: size.width, height: size.height)
                 .environment(\.colorScheme, dark ? .dark : .light)
+                .environment(\.isSnapshotMode, true)
             let renderer = ImageRenderer(content: content)
             renderer.scale = 2
             let image = try XCTUnwrap(renderer.uiImage, "Couldn't render \(name)")

@@ -24,7 +24,7 @@ struct SetupView: View {
         VStack(spacing: 0) {
             TopBar(leading: ("Back", { app.screen = .home }), trailing: saveAction)
 
-            ScrollView {
+            Scrolling {
                 VStack(spacing: Style.gap) {
                     Text("Players")
                         .font(Style.title)

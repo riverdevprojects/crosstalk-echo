@@ -71,7 +71,7 @@ struct RevealView: View {
             }
             .padding(.vertical, Style.gap)
 
-            ScrollView {
+            Scrolling {
                 VStack(spacing: Style.gap) {
                     ForEach(team.players) { player in
                         let done = session.hasRevealed(player)
