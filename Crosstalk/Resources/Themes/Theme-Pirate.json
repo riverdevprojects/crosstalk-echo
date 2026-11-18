@@ -1,0 +1,15 @@
+{
+  "id": "pirate",
+  "name": "Pirate",
+  "order": 1,
+  "showsNameToEcho": true,
+  "words": [
+    "parrot", "cannon", "ship", "treasure", "map", "anchor", "sword", "plank",
+    "captain", "flag", "island", "compass", "barrel", "rum", "hook", "eyepatch",
+    "telescope", "chest", "gold", "coin", "jewel", "skull", "sail", "mast",
+    "deck", "cabin", "crew", "storm", "wave", "shark", "mermaid", "cannonball",
+    "rope", "knot", "harbor", "lighthouse", "shipwreck", "cave", "beach", "palm tree",
+    "sea", "lantern", "bottle", "pistol", "dagger", "boot", "hat", "beard",
+    "mutiny", "kraken", "seagull", "dinghy"
+  ]
+}

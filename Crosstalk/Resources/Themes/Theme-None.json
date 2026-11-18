@@ -1,0 +1,24 @@
+{
+  "id": "none",
+  "name": "None",
+  "order": 0,
+  "showsNameToEcho": false,
+  "words": [
+    "apple", "banana", "bread", "cheese", "pizza", "sandwich", "egg", "coffee", "honey", "cookie",
+    "soup", "carrot", "lemon", "popcorn", "chocolate", "pancake", "salt", "butter", "cake", "orange",
+    "dog", "cat", "horse", "rabbit", "elephant", "lion", "monkey", "snake", "frog", "owl",
+    "bee", "spider", "penguin", "whale", "turtle", "duck", "cow", "bear", "mouse", "butterfly",
+    "chair", "table", "bed", "pillow", "blanket", "lamp", "mirror", "window", "door", "clock",
+    "sofa", "carpet", "candle", "key", "toothbrush", "towel", "fridge", "oven", "spoon", "fork",
+    "knife", "plate", "cup", "bucket", "ladder", "scissors", "umbrella", "wallet", "backpack", "glasses",
+    "shoe", "sock", "jacket", "scarf", "glove", "belt", "ring", "necklace", "crown", "button",
+    "car", "bicycle", "train", "airplane", "boat", "bus", "rocket", "helicopter", "tractor", "skateboard",
+    "tree", "flower", "grass", "mountain", "river", "ocean", "desert", "volcano", "rainbow", "cloud",
+    "snow", "rain", "sun", "moon", "star", "forest", "beach", "island", "waterfall", "lightning",
+    "doctor", "teacher", "farmer", "chef", "pilot", "firefighter", "artist", "clown", "king", "astronaut",
+    "guitar", "piano", "drum", "camera", "phone", "computer", "television", "radio", "book", "newspaper",
+    "ball", "kite", "balloon", "puzzle", "robot", "doll", "trophy", "ticket", "map", "magnet",
+    "school", "hospital", "library", "castle", "bridge", "garden", "kitchen", "museum", "airport", "zoo",
+    "birthday", "wedding", "holiday", "picnic", "concert", "ghost", "dragon", "treasure", "shadow", "dream"
+  ]
+}

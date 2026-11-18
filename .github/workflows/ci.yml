@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Build and test (iOS Simulator)
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Pick an iPhone simulator
+        id: sim
+        run: |
+          UDID=$(xcrun simctl list devices available -j \
+            | /usr/bin/python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for k,v in sorted(d.items(), reverse=True) if "iOS" in k for x in v if x["name"].startswith("iPhone")))')
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+          xcrun simctl list devices available | grep "$UDID"
+
+      - name: Build and run tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project Crosstalk.xcodeproj \
+            -scheme Crosstalk \
+            -destination "platform=iOS Simulator,id=${{ steps.sim.outputs.udid }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee xcodebuild.log
