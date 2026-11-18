@@ -42,13 +42,13 @@ struct RulesView: View {
     }
 
     private let rules: [Rule] = [
-        ("Teams", "Two teams of at least two. Both teams get the same word."),
-        ("The Echo", "One player on each team is the Echo. They don't know the word. The app picks them at random."),
-        ("Hints", "Teams take turns giving one spoken hint at a time, cycling through everyone who isn't the Echo."),
-        ("Too close", "A hint can't be too close to the word. You're the judges: if the table says it's too close, it doesn't count."),
-        ("Guessing", "After a hint, the other team's Echo guesses first. If they pass, the hinting team's Echo guesses. Each Echo gets up to two guesses per hint."),
-        ("Winning", "The first Echo to say the word wins the round."),
-        ("The phone", "Whoever holds the phone taps Done after each hint, or Exit when an Echo gets the word."),
+        Rule("Teams", "Two teams of at least two. Both teams get the same word."),
+        Rule("The Echo", "One player on each team is the Echo. They don't know the word. The app picks them at random."),
+        Rule("Hints", "Teams take turns giving one spoken hint at a time, cycling through everyone who isn't the Echo."),
+        Rule("Too close", "A hint can't be too close to the word. You're the judges: if the table says it's too close, it doesn't count."),
+        Rule("Guessing", "After a hint, the other team's Echo guesses first. If they pass, the hinting team's Echo guesses. Each Echo gets up to two guesses per hint."),
+        Rule("Winning", "The first Echo to say the word wins the round."),
+        Rule("The phone", "Whoever holds the phone taps Done after each hint, or Exit when an Echo gets the word."),
     ]
 
     var body: some View {

@@ -217,7 +217,8 @@ final class GameEngineTests: XCTestCase {
         let defaults = UserDefaults(suiteName: "CrosstalkTests-\(UUID())")!
         let themes = [theme, hidden, WordTheme(id: "pirate", name: "Pirate", words: ["ship"])]
         XCTAssertEqual(ThemeStore(themes: themes, defaults: defaults).selectedID, "pirate")
-        ThemeStore(themes: themes, defaults: defaults).selectedID = "none"
+        let store = ThemeStore(themes: themes, defaults: defaults)
+        store.selectedID = "none"
         XCTAssertEqual(ThemeStore(themes: themes, defaults: defaults).selectedID, "none")
     }
 }
