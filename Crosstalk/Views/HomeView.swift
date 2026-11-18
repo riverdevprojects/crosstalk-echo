@@ -57,7 +57,7 @@ struct RulesView: View {
                 Spacer()
                 Button("Close") { dismiss() }.buttonStyle(.textLink)
             }
-            Scrolling {
+            ScrollView {
                 VStack(alignment: .leading, spacing: Style.gap) {
                     Text("How to play")
                         .font(Style.title)

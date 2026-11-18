@@ -35,6 +35,10 @@ struct GameView: View {
         }
         .screen()
         .animation(.easeInOut(duration: 0.2), value: session.phase)
+        // Nobody touches the phone while hints are being talked through, so
+        // keep the screen from auto-locking for the length of a game.
+        .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
+        .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
         .confirmationDialog("End this game?", isPresented: $confirmingQuit, titleVisibility: .visible) {
             Button("End game", role: .destructive) { app.goHome() }
             Button("Keep playing", role: .cancel) {}
@@ -71,7 +75,7 @@ struct RevealView: View {
             }
             .padding(.vertical, Style.gap)
 
-            Scrolling {
+            ScrollView {
                 VStack(spacing: Style.gap) {
                     ForEach(team.players) { player in
                         let done = session.hasRevealed(player)
@@ -134,7 +138,7 @@ struct CardView: View {
                     Text("Your word is")
                         .font(Style.body)
                         .foregroundStyle(Style.muted)
-                    Text(word.capitalized)
+                    Text(WordDisplay.format(word))
                         .font(Style.display)
                         .multilineTextAlignment(.center)
                         .minimumScaleFactor(0.5)
@@ -172,6 +176,19 @@ struct CardView: View {
 
 struct HintView: View {
     @ObservedObject var session: GameSession
+
+    /// The phone gets passed around mid-game, so a quick double tap on Done
+    /// is easy and would silently skip a hinter. Taps closer together than
+    /// this are ignored.
+    private static let doneCooldown: TimeInterval = 0.6
+    @State private var lastDoneTap = Date.distantPast
+
+    private func done() {
+        let now = Date()
+        guard now.timeIntervalSince(lastDoneTap) >= Self.doneCooldown else { return }
+        lastDoneTap = now
+        session.nextHint()
+    }
 
     var body: some View {
         let turn = session.currentHint
@@ -212,7 +229,7 @@ struct HintView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .box(filled: false)
 
-            Button("Done") { session.nextHint() }
+            Button("Done", action: done)
                 .buttonStyle(.primaryBox)
                 .accessibilityHint("No one got it. Go to the next hint.")
             Button("Exit") { session.exitRound() }
@@ -280,7 +297,7 @@ struct ResultsView: View {
                 Text("The word was")
                     .font(Style.body)
                     .foregroundStyle(Style.muted)
-                Text(session.round.word.capitalized)
+                Text(WordDisplay.format(session.round.word))
                     .font(Style.display)
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.5)

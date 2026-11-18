@@ -89,9 +89,12 @@ struct BoxButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(Style.headline)
+            // Shrink a little to stay on one line; at large text sizes wrap
+            // to a second centered line rather than cutting the label off.
             .multilineTextAlignment(.center)
-            .lineLimit(1)
-            .minimumScaleFactor(0.75)
+            .lineLimit(2)
+            .minimumScaleFactor(0.85)
+            .padding(.vertical, 6)
             .frame(maxWidth: .infinity, minHeight: Style.buttonHeight)
             .padding(.horizontal, Style.padding)
             .foregroundStyle(kind == .primary ? Style.background : Style.ink)
@@ -123,36 +126,4 @@ struct TextLinkStyle: ButtonStyle {
 
 extension ButtonStyle where Self == TextLinkStyle {
     static var textLink: TextLinkStyle { TextLinkStyle() }
-}
-
-// MARK: - Scrolling
-
-private struct SnapshotModeKey: EnvironmentKey {
-    static let defaultValue = false
-}
-
-extension EnvironmentValues {
-    /// Set by the snapshot tests: ImageRenderer can't draw ScrollView
-    /// contents, so `Scrolling` lays content out flat instead.
-    var isSnapshotMode: Bool {
-        get { self[SnapshotModeKey.self] }
-        set { self[SnapshotModeKey.self] = newValue }
-    }
-}
-
-/// A vertical ScrollView with the app's standard behavior.
-struct Scrolling<Content: View>: View {
-    @Environment(\.isSnapshotMode) private var isSnapshotMode
-    @ViewBuilder var content: Content
-
-    var body: some View {
-        if isSnapshotMode {
-            VStack(spacing: 0) {
-                content
-                Spacer(minLength: 0)
-            }
-        } else {
-            ScrollView { content }
-        }
-    }
 }

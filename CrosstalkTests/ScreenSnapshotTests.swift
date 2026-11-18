@@ -40,14 +40,38 @@ final class ScreenSnapshotTests: XCTestCase {
                 .environmentObject(app)
                 .environmentObject(themes)
                 .environmentObject(templates)
-                .frame(width: size.width, height: size.height)
-                .environment(\.colorScheme, dark ? .dark : .light)
-                .environment(\.isSnapshotMode, true)
-            let renderer = ImageRenderer(content: content)
-            renderer.scale = 2
-            let image = try XCTUnwrap(renderer.uiImage, "Couldn't render \(name)")
+            let image = try snapshot(content, size: size, dark: dark)
             let data = try XCTUnwrap(image.pngData())
             try data.write(to: outputDir.appendingPathComponent("\(name)-\(device)\(dark ? "-dark" : "").png"))
+        }
+    }
+
+    /// Hosts the view in a real window and draws the window's hierarchy, so
+    /// ScrollView, TextField and other UIKit-backed views render as they do
+    /// in the app (ImageRenderer leaves those blank).
+    private func snapshot<V: View>(_ view: V, size: CGSize, dark: Bool) throws -> UIImage {
+        let scene = try XCTUnwrap(
+            UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first,
+            "No window scene in the test host"
+        )
+        let window = UIWindow(windowScene: scene)
+        window.frame = CGRect(origin: .zero, size: size)
+        window.overrideUserInterfaceStyle = dark ? .dark : .light
+        let host = UIHostingController(rootView: view)
+        window.rootViewController = host
+        window.isHidden = false
+        defer { window.isHidden = true }
+
+        host.view.frame = window.bounds
+        host.view.layoutIfNeeded()
+        // Give SwiftUI a moment to finish its first layout and render pass.
+        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 2
+        format.opaque = true
+        return UIGraphicsImageRenderer(bounds: window.bounds, format: format).image { _ in
+            window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
         }
     }
 

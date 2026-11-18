@@ -59,16 +59,9 @@ struct Round: Equatable {
 }
 
 enum GameEngine {
-    /// Trims names, drops blanks and case-insensitive duplicates.
+    /// Trims names, drops blanks and duplicates (same rule as everywhere else).
     static func cleanNames(_ names: [String]) -> [String] {
-        var seen = Set<String>()
-        var result: [String] = []
-        for raw in names {
-            let name = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !name.isEmpty, seen.insert(name.lowercased()).inserted else { continue }
-            result.append(name)
-        }
-        return result
+        TextCleaning.clean(names)
     }
 
     static func canStart(playerCount: Int) -> Bool {
@@ -88,7 +81,7 @@ enum GameEngine {
         ]
     }
 
-    /// Picks a word not in `usedWords` (case-insensitive) when possible, and a
+    /// Picks a word whose `TextCleaning.key` isn't in `usedWords` when possible, and a
     /// fresh random Echo for each team.
     static func makeRound<R: RandomNumberGenerator>(
         teams: [Team],
@@ -99,7 +92,7 @@ enum GameEngine {
         precondition(teams.count == 2 && teams.allSatisfy { $0.players.count >= 2 })
         let pool = theme.cleanWords
         precondition(!pool.isEmpty, "Theme \(theme.id) has no words")
-        let fresh = pool.filter { !usedWords.contains($0.lowercased()) }
+        let fresh = pool.filter { !usedWords.contains(TextCleaning.key($0)) }
         let word = (fresh.isEmpty ? pool : fresh).randomElement(using: &rng)!
         let echoes = teams.map { $0.players.randomElement(using: &rng)! }
         return Round(word: word, theme: theme, teams: teams, echoes: echoes)

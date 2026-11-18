@@ -184,6 +184,28 @@ final class GameEngineTests: XCTestCase {
         XCTAssertEqual(session.phase, .results(winner: nil))
     }
 
+    // MARK: Word display
+
+    func testWordDisplayUsesSentenceCaseAndKeepsAcronyms() {
+        XCTAssertEqual(WordDisplay.format("apple"), "Apple")
+        XCTAssertEqual(WordDisplay.format("tug of war"), "Tug of war")
+        XCTAssertEqual(WordDisplay.format("smart tv"), "Smart TV")
+        XCTAssertEqual(WordDisplay.format("3d glasses"), "3D glasses")
+        XCTAssertEqual(WordDisplay.format("dvd"), "DVD")
+        XCTAssertEqual(WordDisplay.format("x-ray"), "X-ray")
+        XCTAssertEqual(WordDisplay.format("director's chair"), "Director's chair")
+        XCTAssertEqual(WordDisplay.format("piñata"), "Piñata")
+        XCTAssertEqual(WordDisplay.format(""), "")
+    }
+
+    func testEveryBundledWordFormatsToNonEmptyText() {
+        for theme in ThemeStore.loadBundledThemes(bundle: Bundle(for: GameSession.self)) {
+            for word in theme.words {
+                XCTAssertFalse(WordDisplay.format(word).isEmpty, "\(theme.id): \(word)")
+            }
+        }
+    }
+
     // MARK: Bundled data
 
     func testBundledThemesLoadAndAreUsable() {
@@ -192,6 +214,7 @@ final class GameEngineTests: XCTestCase {
             Set(themes.map(\.id)),
             ["none", "pirate", "animals", "food-drink", "sports", "movies-tv", "travel"]
         )
+        XCTAssertEqual(Set(themes.map(\.id)).count, themes.count, "Two theme files share an id")
         XCTAssertEqual(Set(themes.map(\.order)).count, themes.count, "Each theme needs its own sort order")
         for theme in themes {
             XCTAssertGreaterThanOrEqual(theme.cleanWords.count, 150, theme.id)
@@ -218,6 +241,34 @@ final class GameEngineTests: XCTestCase {
 
         store.delete(store.templates[0])
         XCTAssertTrue(PartyTemplateStore(defaults: defaults).templates.isEmpty)
+    }
+
+    func testDuplicateThemeIDsKeepOnlyTheFirst() {
+        let defaults = UserDefaults(suiteName: "CrosstalkTests-\(UUID())")!
+        let a = WordTheme(id: "pirate", name: "Pirate", order: 1, words: ["ship"])
+        let b = WordTheme(id: "pirate", name: "Pirate Copy", order: 2, words: ["parrot"])
+        let store = ThemeStore(themes: [b, a], defaults: defaults)
+        XCTAssertEqual(store.themes.map(\.name), ["Pirate"])
+    }
+
+    func testUnreadableSavedPartiesAreKeptAsideNotOverwritten() {
+        let defaults = UserDefaults(suiteName: "CrosstalkTests-\(UUID())")!
+        let junk = Data("not json".utf8)
+        defaults.set(junk, forKey: "partyTemplates")
+
+        let store = PartyTemplateStore(defaults: defaults)
+        XCTAssertTrue(store.templates.isEmpty)
+        store.save(name: "New", playerNames: ["Ana", "Ben"])
+
+        XCTAssertEqual(defaults.data(forKey: PartyTemplateStore.unreadableBackupKey), junk)
+        XCTAssertEqual(PartyTemplateStore(defaults: defaults).templates.map(\.name), ["New"])
+    }
+
+    func testTextCleaningIsOneRuleForNamesWordsAndParties() {
+        XCTAssertEqual(TextCleaning.key("  Ana "), TextCleaning.key("ANA"))
+        XCTAssertEqual(TextCleaning.key("Élodie"), TextCleaning.key("élodie"))
+        XCTAssertEqual(TextCleaning.clean(["Ana", "ana", " ", "Ben"]), ["Ana", "Ben"])
+        XCTAssertEqual(WordTheme(id: "x", name: "X", words: ["Ship", "ship", ""]).cleanWords, ["Ship"])
     }
 
     func testThemeSelectionIsRemembered() {

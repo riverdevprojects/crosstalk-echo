@@ -61,5 +61,9 @@ struct RootView: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: app.screen)
+        // Text still scales with the user's setting, up to the largest
+        // standard size. The accessibility sizes beyond that would push the
+        // Done/Exit buttons off the fixed-height game screens.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 }

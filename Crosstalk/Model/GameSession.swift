@@ -29,7 +29,7 @@ final class GameSession: ObservableObject {
         teams = GameEngine.makeTeams(from: players, using: &generator)
         round = GameEngine.makeRound(teams: teams, theme: theme, usedWords: [], using: &generator)
         self.rng = generator.base
-        usedWords.insert(round.word.lowercased())
+        usedWords.insert(TextCleaning.key(round.word))
     }
 
     var currentHint: HintTurn { round.hintTurn(hintNumber) }
@@ -82,7 +82,7 @@ final class GameSession: ObservableObject {
         var generator = AnyRNG(rng)
         round = GameEngine.makeRound(teams: teams, theme: theme, usedWords: usedWords, using: &generator)
         rng = generator.base
-        usedWords.insert(round.word.lowercased())
+        usedWords.insert(TextCleaning.key(round.word))
         revealed = []
         hintNumber = 0
         phase = .reveal(teamIndex: 0)

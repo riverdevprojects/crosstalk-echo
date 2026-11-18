@@ -14,7 +14,7 @@ struct SetupView: View {
     private var players: [Player] { app.draftPlayers }
     private var trimmedNewName: String { newName.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var isDuplicate: Bool {
-        players.contains { $0.name.caseInsensitiveCompare(trimmedNewName) == .orderedSame }
+        players.contains { TextCleaning.key($0.name) == TextCleaning.key(trimmedNewName) }
     }
     private var isFull: Bool { players.count >= GameRules.maxPlayers }
     private var canAdd: Bool { !trimmedNewName.isEmpty && !isDuplicate && !isFull }
@@ -24,7 +24,7 @@ struct SetupView: View {
         VStack(spacing: 0) {
             TopBar(leading: ("Back", { app.screen = .home }), trailing: saveAction)
 
-            Scrolling {
+            ScrollView {
                 VStack(spacing: Style.gap) {
                     Text("Players")
                         .font(Style.title)
@@ -62,6 +62,7 @@ struct SetupView: View {
             Button("Save") {
                 templates.save(name: partyName, playerNames: players.map(\.name))
             }
+            .disabled(partyName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Saves these \(players.count) names so you can pick them next time. Teams are still split fresh each game.")

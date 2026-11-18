@@ -15,9 +15,13 @@ final class ThemeStore: ObservableObject {
 
     init(themes: [WordTheme]? = nil, defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        var seenIDs = Set<String>()
         let loaded = (themes ?? Self.loadBundledThemes())
             .filter { !$0.cleanWords.isEmpty }
             .sorted { ($0.order, $0.name) < ($1.order, $1.name) }
+            // Two files with the same id would break the theme list and the
+            // saved selection; keep the first and ignore the rest.
+            .filter { seenIDs.insert($0.id).inserted }
         self.themes = loaded.isEmpty ? [Self.fallbackTheme] : loaded
 
         let saved = defaults.string(forKey: Self.selectionKey)

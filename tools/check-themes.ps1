@@ -22,21 +22,28 @@ foreach ($file in Get-ChildItem (Join-Path $dir "Theme-*.json") | Sort-Object Na
     "{0,-22} {1,5} words  ({2} multi-word)  dups: {3}" -f $json.name, $clean.Count, $multi, ($(if ($dups) { $dups -join ", " } else { "none" }))
     if ($dups) { $ok = $false }
 
-    if ($Fix -and ($dups -or ($clean.Count -ne $json.words.Count))) {
+    $changed = (@($json.words) -join "`n") -cne ($clean -join "`n")
+    if ($Fix -and $changed) {
         $json.words = $clean.ToArray()
+        # Replace only the "words" array in the original text, so every other
+        # field (including optional ones that may be absent) stays as written.
         $lines = @()
         for ($i = 0; $i -lt $clean.Count; $i += 10) {
-            $chunk = $clean[$i..([Math]::Min($i + 9, $clean.Count - 1))] | ForEach-Object { '"' + $_.Replace('"', '\"') + '"' }
+            $chunk = $clean[$i..([Math]::Min($i + 9, $clean.Count - 1))] |
+                ForEach-Object { '"' + $_.Replace('\', '\\').Replace('"', '\"') + '"' }
             $lines += "    " + ($chunk -join ", ")
         }
-        $body = "{`n" +
-            "  `"id`": `"$($json.id)`",`n" +
-            "  `"name`": `"$($json.name)`",`n" +
-            "  `"order`": $($json.order),`n" +
-            "  `"showsNameToEcho`": $($json.showsNameToEcho.ToString().ToLower()),`n" +
-            "  `"words`": [`n" + ($lines -join ",`n") + "`n  ]`n}`n"
-        [System.IO.File]::WriteAllText($file.FullName, $body, (New-Object System.Text.UTF8Encoding($false)))
-        "  -> rewrote $($file.Name)"
+        $array = "`"words`": [`n" + ($lines -join ",`n") + "`n  ]"
+        $text = [System.IO.File]::ReadAllText($file.FullName)
+        $pattern = '"words"\s*:\s*\[(?:[^\[\]"]|"(?:[^"\\]|\\.)*")*\]'
+        if (-not [regex]::IsMatch($text, $pattern)) {
+            "  !! couldn't find the words array in $($file.Name); left unchanged"
+            $ok = $false
+            continue
+        }
+        $text = [regex]::Replace($text, $pattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $array })
+        [System.IO.File]::WriteAllText($file.FullName, $text, (New-Object System.Text.UTF8Encoding($false)))
+        "  -> rewrote words in $($file.Name)"
     }
 }
 if (-not $ok -and -not $Fix) { exit 1 }

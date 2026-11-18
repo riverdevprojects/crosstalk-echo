@@ -20,10 +20,20 @@ jobs:
       - name: Pick an iPhone simulator
         id: sim
         run: |
-          UDID=$(xcrun simctl list devices available -j \
-            | /usr/bin/python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next(x["udid"] for k,v in sorted(d.items(), reverse=True) if "iOS" in k for x in v if x["name"].startswith("iPhone")))')
+          # Ask the active Xcode which destinations it can actually build for,
+          # rather than guessing from installed runtimes (the runner image
+          # carries several Xcodes). Takes the newest-OS iPhone it lists.
+          xcodebuild -project Crosstalk.xcodeproj -scheme Crosstalk -showdestinations 2>/dev/null \
+            | grep "platform:iOS Simulator" | grep "name:iPhone" > destinations.txt || true
+          cat destinations.txt
+          UDID=$(while IFS= read -r line; do
+              os=$(printf '%s' "$line" | sed -nE 's/.*OS:([0-9.]+).*/\1/p')
+              id=$(printf '%s' "$line" | sed -nE 's/.*id:([A-Fa-f0-9-]{36}).*/\1/p')
+              if [ -n "$os" ] && [ -n "$id" ]; then echo "$os $id"; fi
+            done < destinations.txt | sort -V -r | head -1 | cut -d' ' -f2)
+          if [ -z "$UDID" ]; then echo "No iPhone simulator destination found"; exit 1; fi
           echo "udid=$UDID" >> "$GITHUB_OUTPUT"
-          xcrun simctl list devices available | grep "$UDID"
+          echo "Using $UDID"
 
       - name: Build and run tests
         env:
