@@ -118,7 +118,7 @@ struct TextLinkStyle: ButtonStyle {
         configuration.label
             .font(Style.body)
             .foregroundStyle(Style.muted)
-            .frame(minWidth: 44, minHeight: 44)
+            .frame(minWidth: 44, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
             .opacity(configuration.isPressed ? 0.5 : 1)
     }
