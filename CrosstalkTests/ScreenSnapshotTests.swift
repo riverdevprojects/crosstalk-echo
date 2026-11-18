@@ -96,6 +96,7 @@ final class ScreenSnapshotTests: XCTestCase {
         try render("06-card-word") { CardView(name: "Bea", card: word) {} }
         try render("07-card-echo") { CardView(name: "Alex", card: .echo(themeName: "Pirate")) {} }
         try render("08-card-echo-none") { CardView(name: "Alex", card: .echo(themeName: nil)) {} }
+        try render("06-card-word", dark: true) { CardView(name: "Bea", card: word) {} }
 
         s.markRevealed(s.teams[0].players[0])
         try render("09-reveal-partial") { GameView(session: s) }

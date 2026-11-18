@@ -60,6 +60,7 @@ struct RootView: View {
                 }
             }
         }
+        .settlesAfterChange(of: app.screen)
         .animation(Style.fade, value: app.screen)
         // Text still scales with the user's setting, up to the largest
         // standard size. The accessibility sizes beyond that would push the

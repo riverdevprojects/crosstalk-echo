@@ -32,6 +32,7 @@ struct GameView: View {
                 }
             }
             .transition(.opacity)
+            .settlesAfterChange(of: session.phase)
         }
         .screen()
         .animation(Style.fade, value: session.phase)
@@ -152,7 +153,10 @@ struct CardView: View {
 
     /// The app switcher snapshots whatever is on screen. Hide the card's
     /// contents whenever the app isn't active so the word can't leak there.
-    @Environment(\.scenePhase) private var scenePhase
+    /// This follows UIKit's app notifications rather than SwiftUI's
+    /// `scenePhase`, so it doesn't depend on the scene phase reaching the
+    /// full-screen cover the card is shown in.
+    @State private var isAppActive = UIApplication.shared.applicationState == .active
 
     var body: some View {
         VStack(spacing: Style.gap) {
@@ -164,7 +168,7 @@ struct CardView: View {
             Spacer()
 
             VStack(spacing: Style.gap) {
-                if scenePhase != .active {
+                if !isAppActive {
                     Text("Hidden")
                         .font(Style.body)
                         .foregroundStyle(Style.muted)
@@ -206,6 +210,12 @@ struct CardView: View {
         }
         .screen()
         .interactiveDismissDisabled()
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            isAppActive = false
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            isAppActive = true
+        }
     }
 }
 
