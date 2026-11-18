@@ -1,48 +1,57 @@
 # Impeccable audit: Crosstalk (iOS)
 
-Run on 2026-11-18 against PR #1, scoped to code quality and polish (`audit`, `harden`, `polish`) only. No visual redesign commands were run and the UI styling was not changed. The checks follow Impeccable's published `audit.native.md`, `ios.md`, `harden.md` and `polish.md` references (github.com/pbakaus/impeccable). The CLI wasn't installed on the build machine, so the references were applied by hand and the report is saved here instead of through Impeccable's storage helper.
+Run on 2026-11-18 against PR #1 with the Impeccable skill installed in Claude Code (github.com/pbakaus/impeccable): `/impeccable init`, then repeated `audit`, `harden` and `polish` rounds until a pass found nothing material. Scope was code quality only. No visual redesign commands were run and the UI styling was not changed. `init` wrote [PRODUCT.md](../PRODUCT.md).
 
-Evidence comes from reading the source, the unit tests, and Simulator snapshots of every screen from CI (iPhone 8 and iPhone 16 sizes, light and dark). Nothing was tested on a physical device.
+An earlier pass applied Impeccable's published references by hand, before the skill was installed. Its fixes are listed at the end.
+
+Evidence comes from the source, the unit tests, and Simulator snapshots of every screen rendered in CI: iPhone 8 and iPhone 16 sizes, light and dark, plus a worst case of 20 players with 20-character names at the largest allowed text size. Nothing was tested on a physical device, and VoiceOver announcements were checked in code, not with VoiceOver running.
 
 ## Audit health score
 
 | # | Dimension | Score | Key finding |
 |---|-----------|-------|-------------|
-| 1 | Accessibility | 3 | Text scales with Dynamic Type up to the largest standard size, but the accessibility sizes are capped |
+| 1 | Accessibility | 4 | Dynamic Type is capped at the largest standard size (accessibility sizes off) |
 | 2 | Performance | 4 | -- |
 | 3 | Appearance & Theming | 4 | -- |
 | 4 | Platform Conformance | 2 | Custom navigation: no edge-swipe back, no system navigation bar |
 | 5 | Adaptivity | 3 | iPhone portrait only (on purpose for a pass-around game) |
-| **Total** | | **16/20** | **Good** |
+| **Total** | | **17/20** | **Good** |
 
 ## Platform conformance verdict
 
 The app reads as native: system colors, SF Symbols, system alerts, confirmation dialogs, context menus, full-screen covers, and correct safe areas. It departs from iOS conventions in two places. Both are design decisions, so they're left for River:
 
-- **Navigation is a hand-rolled screen switch with text "Back" links**, not a `NavigationStack`. iOS's left-edge swipe-back gesture doesn't work on Change Theme or Players, and there's no system navigation bar or large title. Fixing this means changing the navigation model, which is a structural UI decision.
+- **Navigation is a hand-rolled screen switch with text "Back" links**, not a `NavigationStack`. iOS's left-edge swipe-back gesture doesn't work on Change Theme or Players, and there's no system navigation bar or large title.
 - **Baskerville is used for all text, including controls.** The README asks for it. Impeccable's iOS guidance would keep San Francisco for controls and use a brand face only for display text.
 
-## Fixed in this pass
+## Round 1
 
-| Sev | Issue | Where | Fix |
-|---|---|---|---|
-| P1 | A double-tap on Done skipped a hinter | Hint screen | 0.6s cooldown on Done |
-| P1 | Screen auto-locked mid-game | Game | Idle timer off while a game is on screen |
-| P1 | The word showed in the app switcher if the app was backgrounded with a card open | Card | Card contents hidden while the app isn't active |
-| P1 | Saved parties could be wiped after a failed load | Saved parties | Unreadable data kept aside; never overwritten |
-| P2 | No limit on name length; very long names broke the large name displays | Players | 20-character limit, also applied when loading saved parties |
-| P2 | "Add", "Back" and "Quit" touch targets were under 44pt | Players, top bars | 44×44pt targets with no visual change |
-| P2 | Long button labels were cut off at large text sizes | All buttons | Wrap to two centered lines |
-| P2 | Accessibility text sizes pushed Done/Exit off the fixed-height game screens | App | Text scales up to the largest standard size |
-| P2 | Save party with a blank name failed silently | Players | Save disabled until a name is entered |
-| P3 | Words displayed as "Tug Of War" and "Dvd" | Card, results | Sentence case, acronyms kept ("Smart TV") |
-| P3 | VoiceOver said "Selected" twice on the chosen theme | Change Theme | Checkmark hidden from VoiceOver |
-| P3 | Three slightly different copies of the name and word cleaning rule | Model | One shared `TextCleaning` rule |
-| P3 | Dead code (`revealingTeam`, `roundsPlayed`) | GameSession | Removed |
+| Sev | Issue | Fix |
+|---|---|---|
+| P2 | A double tap on "Play again" used up a second word | Only works from the results screen; tests added |
+| P2 | VoiceOver didn't announce the next hinter after Done, or the automatic switch to Team 2 | Announced |
+| P2 | Deleting a saved party was only possible by touch and hold | Delete action for VoiceOver |
+| P3 | Reveal rows put hint text in the VoiceOver label | Name, value ("Seen"), and hint split |
+| P3 | Repeated spacing, tap-size, opacity, animation and icon values typed into views | Style tokens with the same values |
+| P2 | No evidence that fixed-height screens fit with long names at large text | Stress snapshots added; all fit on iPhone 8 |
+
+## Round 2
+
+| Sev | Issue | Fix |
+|---|---|---|
+| P1 | Buttons on consecutive screens line up, so a quick double tap made a second choice on the next screen: Exit then "No one", a winner then "Play again", Start Game then a name card, Home's Start Game then a saved party | Taps ignored for 0.5s after every screen change (`SettleAfterChange.swift`) |
+| P2 | The card's app-switcher privacy relied on SwiftUI's scene phase reaching a full-screen cover, and snapshots only ever showed "Hidden" | Uses UIKit's resign/become-active notifications; snapshots now show real card contents |
+
+## Round 3
+
+| Sev | Issue | Fix |
+|---|---|---|
+| P2 | A quick double tap on Hide could open the next name's card in front of the wrong person | Name list ignores taps for 0.5s after a card opens or closes |
 
 ## Hardening checks that passed
 
-- **Rapid taps:** Exit, winner selection, Hide, and Start Game are all guarded or safe to repeat.
+- **Rapid taps:** Done has its own cooldown; every screen change and card close pauses input briefly; model actions check the current phase.
+- **Extreme content:** 20 players with 20-character names at the largest text size fit every fixed-height screen on iPhone 8.
 - **Empty states:** no saved parties hides the section, and missing theme files fall back to a built-in word list.
 - **Duplicate data:** duplicate names, words, and theme ids are all handled.
 - **Emoji and accented names** compare correctly (case-folded).
@@ -51,7 +60,7 @@ The app reads as native: system colors, SF Symbols, system alerts, confirmation 
 ## Positive findings
 
 - Semantic system colors throughout. Dark mode works without separate assets.
-- Every visual value is in one place (`Style.swift`), with no hard-coded colors or sizes in views.
+- Every visual value is in `Style.swift`. Views use tokens; the only raw numbers left are local hit-area insets and text scale factors.
 - Platform controls are used where they fit (alerts, confirmation dialogs, context menus, full-screen covers).
 - Game logic is separate from the UI and covered by unit tests.
 
@@ -60,3 +69,7 @@ The app reads as native: system colors, SF Symbols, system alerts, confirmation 
 1. **[P1] Navigation:** move Change Theme and Players onto a `NavigationStack` to get edge-swipe back and a system navigation bar.
 2. **[P2] Typography:** decide whether controls should use San Francisco, with Baskerville kept for display text.
 3. **[P3] Accessibility sizes:** once the layouts scroll or adapt, remove the Dynamic Type cap in `CrosstalkApp.swift`.
+
+## Earlier hand-applied pass
+
+Before the skill was installed: Done double-tap cooldown, screen kept awake during a game, the word hidden from the app switcher, unreadable saved parties kept aside instead of overwritten, a 20-character name limit, 44pt touch targets, wrapping button labels, the Dynamic Type cap, Save disabled without a party name, sentence-case words with acronyms kept, a duplicate VoiceOver "Selected" removed, one shared text-cleaning rule, and dead code removed.

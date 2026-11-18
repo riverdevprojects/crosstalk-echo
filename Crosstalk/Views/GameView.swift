@@ -130,6 +130,10 @@ struct RevealView: View {
                 }
                 .padding(.bottom, Style.screenMargin)
             }
+            // Hide sits over the bottom of this list. Without a pause, the
+            // second tap of a quick double tap on Hide could open the next
+            // card in front of the wrong person.
+            .settlesAfterChange(of: showing)
         }
         // Mark the player as seen only after the card has fully closed, so the
         // switch to the next team never happens underneath an open card.
