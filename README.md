@@ -29,6 +29,7 @@ A party game on one iPhone.
 ## Themes
 
 - Change Theme sets the word pool. Pirate theme = parrot, cannon, ship, etc.
+- Launch themes: None, Pirate, Animals, Food & Drink, Sports, Movies & TV, Travel.
 - None = fully random word. Hard mode, because the Echo doesn't even get a theme.
 
 ## UI
@@ -85,6 +86,24 @@ CrosstalkTests/             Unit tests for the model
 ```
 
 `order` sets its position in the list. `showsNameToEcho: false` hides the theme name from the Echo; that's how None works.
+
+After editing a word list, run `powershell -File tools/check-themes.ps1` (Windows) or `pwsh tools/check-themes.ps1` (Mac). It prints each theme's word count and flags duplicates. Add `-Fix` to remove duplicates and lowercase everything automatically. The unit tests check the same rules.
+
+Launch themes and word counts:
+
+| Theme | Words |
+|---|---|
+| None | 1,134 |
+| Food & Drink | 371 |
+| Animals | 266 |
+| Sports | 265 |
+| Travel | 247 |
+| Movies & TV | 230 |
+| Pirate | 156 |
+
+Every theme aims for about 1,000 words but stops where it would need obscure words. Only None reaches 1,000.
+
+**App icon.** `tools/make-icon.ps1` draws the placeholder icon (one speech bubble on a neutral background). Replace `Crosstalk/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` with any 1024×1024 PNG without transparency; Xcode generates every other size.
 
 **Tests.** Product > Test in Xcode, or:
 

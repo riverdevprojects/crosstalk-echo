@@ -188,13 +188,20 @@ final class GameEngineTests: XCTestCase {
 
     func testBundledThemesLoadAndAreUsable() {
         let themes = ThemeStore.loadBundledThemes(bundle: Bundle(for: GameSession.self))
-        let ids = Set(themes.map(\.id))
-        XCTAssertTrue(ids.contains("pirate"))
-        XCTAssertTrue(ids.contains("none"))
+        XCTAssertEqual(
+            Set(themes.map(\.id)),
+            ["none", "pirate", "animals", "food-drink", "sports", "movies-tv", "travel"]
+        )
+        XCTAssertEqual(Set(themes.map(\.order)).count, themes.count, "Each theme needs its own sort order")
         for theme in themes {
-            XCTAssertGreaterThanOrEqual(theme.cleanWords.count, 40, theme.id)
+            XCTAssertGreaterThanOrEqual(theme.cleanWords.count, 150, theme.id)
             XCTAssertEqual(theme.cleanWords.count, theme.words.count, "\(theme.id) has blank or duplicate words")
+            for word in theme.words {
+                XCTAssertEqual(word, word.lowercased(), "\(theme.id): \(word) should be lowercase")
+                XCTAssertEqual(word, word.trimmingCharacters(in: .whitespaces), "\(theme.id): '\(word)' has stray spaces")
+            }
         }
+        XCTAssertGreaterThanOrEqual(themes.first { $0.id == "none" }!.cleanWords.count, 1000)
         XCTAssertEqual(themes.first { $0.id == "none" }?.showsNameToEcho, false)
     }
 

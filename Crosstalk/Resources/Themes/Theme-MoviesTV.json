@@ -1,0 +1,31 @@
+{
+  "id": "movies-tv",
+  "name": "Movies & TV",
+  "order": 5,
+  "showsNameToEcho": true,
+  "words": [
+    "movie", "film", "show", "series", "episode", "season", "pilot", "finale", "sequel", "prequel",
+    "remake", "trilogy", "franchise", "spinoff", "rerun", "marathon", "premiere", "trailer", "teaser", "preview",
+    "cinema", "theater", "screen", "projector", "popcorn", "ticket", "usher", "seat", "aisle", "balcony",
+    "drive-in", "matinee", "box office", "concession", "soda", "candy", "nachos", "television", "remote", "couch",
+    "channel", "network", "streaming", "subscription", "binge", "playlist", "watchlist", "pause", "rewind", "fast forward",
+    "volume", "subtitles", "captions", "dubbing", "credits", "intermission", "cliffhanger", "plot twist", "spoiler", "ending",
+    "beginning", "scene", "shot", "take", "cut", "montage", "flashback", "close-up", "slow motion", "special effects",
+    "stunt", "explosion", "chase", "car chase", "fight scene", "dance number", "musical", "comedy", "drama", "horror",
+    "thriller", "mystery", "romance", "western", "cartoon", "animation", "documentary", "sitcom", "soap opera", "reality show",
+    "game show", "talk show", "news", "commercial", "infomercial", "miniseries", "anthology", "superhero", "villain", "hero",
+    "sidekick", "monster", "alien", "robot", "zombie", "vampire", "ghost", "wizard", "princess", "detective",
+    "spy", "cowboy", "pirate", "knight", "dragon", "dinosaur", "time travel", "spaceship", "haunted house", "treasure hunt",
+    "actor", "actress", "star", "celebrity", "cast", "crew", "director", "producer", "writer", "screenwriter",
+    "editor", "stuntman", "stunt double", "extra", "understudy", "voice actor", "narrator", "host", "judge", "contestant",
+    "audience", "critic", "fan", "fandom", "autograph", "paparazzi", "red carpet", "award", "trophy", "nomination",
+    "speech", "rating", "review", "stars", "thumbs up", "blockbuster", "flop", "hit", "classic", "cult classic",
+    "budget", "studio", "set", "stage", "backstage", "dressing room", "costume", "wig", "makeup", "prop",
+    "script", "line", "cue", "rehearsal", "audition", "casting", "callback", "clapperboard", "camera", "lens",
+    "microphone", "spotlight", "green screen", "tripod", "director's chair", "megaphone", "lights", "action", "quiet", "wrap",
+    "blooper", "outtake", "deleted scene", "behind the scenes", "soundtrack", "theme song", "score", "jingle", "laugh track", "applause",
+    "catchphrase", "quote", "character", "role", "lead", "cameo", "guest star", "plot", "story", "storyline",
+    "setting", "genre", "poster", "billboard", "dvd", "vhs", "antenna", "satellite", "cable", "smart tv",
+    "tablet", "headphones", "movie night", "sleepover", "date night", "popcorn bucket", "3d glasses", "front row", "back row", "sold out"
+  ]
+}
