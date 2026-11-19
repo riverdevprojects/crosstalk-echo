@@ -42,13 +42,14 @@ struct RulesView: View {
     }
 
     private let rules: [Rule] = [
-        Rule("Teams", "Two teams of at least two. Both teams get the same word."),
-        Rule("The Echo", "One player on each team is the Echo. They don't know the word. The app picks them at random."),
-        Rule("Hints", "Teams take turns giving one spoken hint at a time, cycling through everyone who isn't the Echo."),
-        Rule("Too close", "A hint can't be too close to the word. You're the judges: if the table says it's too close, it doesn't count."),
-        Rule("Guessing", "After a hint, the other team's Echo guesses first. If they pass, the hinting team's Echo guesses. Each Echo gets up to two guesses per hint."),
-        Rule("Winning", "The first Echo to say the word wins the round."),
-        Rule("The phone", "Whoever holds the phone taps Done after each hint, or Exit when an Echo gets the word."),
+        Rule("Teams", "Two teams of at least two. Both get the same word."),
+        Rule("The Echo", "One random player per team is the Echo. They don't know the word."),
+        Rule("Hints", "Teams take turns giving one spoken hint. Everyone but the Echo takes a turn."),
+        Rule("Too close", "A hint can't be too close to the word. The table decides."),
+        Rule("Guessing", "After a hint, the other team's Echo guesses first, then the hinting team's Echo. Two guesses each per hint."),
+        Rule("Showdown", "After \(GameRules.hintsBeforeShowdown) hints, both Echos guess until one runs out of guesses."),
+        Rule("Winning", "First Echo to say the word wins."),
+        Rule("The phone", "After each hint, tap Next hint, or Echo got it when an Echo says the word."),
     ]
 
     var body: some View {

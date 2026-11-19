@@ -48,9 +48,24 @@ The app reads as native: system colors, SF Symbols, system alerts, confirmation 
 |---|---|---|
 | P2 | A quick double tap on Hide could open the next name's card in front of the wrong person | Name list ignores taps for 0.5s after a card opens or closes |
 
+## Round 4: color and motion (requested UI change)
+
+River asked for a visual update: team colors, a neutral accent, slide transitions and motion, a distinct word card, and the hint buttons renamed to "Next hint" and "Echo got it". The Impeccable skill wasn't installed on the machine that did this work, so its audit and polish checks were applied by hand, using the same snapshots plus mid-transition frames captured in the Simulator.
+
+| Sev | Issue | Fix |
+|---|---|---|
+| P2 | During a phase change the old and new screens stacked inside one VStack, so the layout jumped mid-slide | Each changing area sits in a ZStack, so the two overlap while they slide |
+| P2 | Going back, the returning screen is opaque and covered the outgoing one, which only drifted 30% | Back slides the outgoing screen fully off to the trailing edge |
+| P2 | SwiftUI builds a removed view's transition from its last render, so the direction (forward or back) could be stale | The direction lives in a reference object that the transition reads when it starts |
+| P2 | A shorter tap pause after Hide would make a stray tap more likely to open the next card in front of the wrong person | Screen changes now pause for 0.35s, the length of the slide; the name list keeps its 0.5s pause after a card closes |
+| P3 | A pale ring of team tint showed outside the card's border | Tint drawn inside the border |
+| P3 | The new hinter's slide ignored right-to-left layouts | Uses the layout direction like the screen pushes |
+
+Checked: every new color pair is at least 4.5:1 in light and dark mode (team 1 blue 5.6 to 9.5, team 2 orange 5.1 to 10, accent 12 to 16, secondary text 6.6 to 10); blue and orange stay distinct for common color blindness. With Reduce Motion on, slides, the card flip, button scaling and the score bump become fades or are skipped. VoiceOver hears the real score, not the animated one, and the card's face-down side is hidden from it. The 20-player, largest-text screens still fit on iPhone 8.
+
 ## Hardening checks that passed
 
-- **Rapid taps:** Done has its own cooldown; every screen change and card close pauses input briefly; model actions check the current phase.
+- **Rapid taps:** Next hint has its own cooldown; every screen change pauses input for the length of its slide and every card close for 0.5s; model actions check the current phase.
 - **Extreme content:** 20 players with 20-character names at the largest text size fit every fixed-height screen on iPhone 8.
 - **Empty states:** no saved parties hides the section, and missing theme files fall back to a built-in word list.
 - **Duplicate data:** duplicate names, words, and theme ids are all handled.
@@ -59,7 +74,7 @@ The app reads as native: system colors, SF Symbols, system alerts, confirmation 
 
 ## Positive findings
 
-- Semantic system colors throughout. Dark mode works without separate assets.
+- System background and text colors, plus team and accent colors that each have a light and dark value in `Style.swift`. Dark mode works without separate assets.
 - Every visual value is in `Style.swift`. Views use tokens; the only raw numbers left are local hit-area insets and text scale factors.
 - Platform controls are used where they fit (alerts, confirmation dialogs, context menus, full-screen covers).
 - Game logic is separate from the UI and covered by unit tests.

@@ -5,6 +5,9 @@ enum GameRules {
     static let minPlayers = 4
     static let maxPlayers = 20
     static let guessesPerEcho = 2
+    /// After this many hints, both Echos keep guessing until one of them
+    /// runs out of guesses.
+    static let hintsBeforeShowdown = 10
     /// Long enough for any real name; short enough to fit the big hint screen.
     static let maxNameLength = 20
 }
@@ -22,6 +25,9 @@ struct HintTurn: Equatable {
     let number: Int
     let team: Team
     let player: Player
+
+    /// Past the hint limit: both Echos guess until one runs out.
+    var isShowdown: Bool { number >= GameRules.hintsBeforeShowdown }
 }
 
 /// One word, with the Echos picked for it. Everything here is decided up front

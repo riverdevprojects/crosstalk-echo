@@ -17,6 +17,9 @@ final class ScreenSnapshotTests: XCTestCase {
         try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
     }
 
+    /// Longest on-appear animation: the card's flip delay plus its spring.
+    private static let settleTime: TimeInterval = 1.4
+
     private let sizes: [(String, CGSize)] = [
         ("iPhone8", CGSize(width: 375, height: 667)),
         ("iPhone16", CGSize(width: 393, height: 852)),
@@ -71,8 +74,9 @@ final class ScreenSnapshotTests: XCTestCase {
 
         host.view.frame = window.bounds
         host.view.layoutIfNeeded()
-        // Give SwiftUI a moment to finish its first layout and render pass.
-        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+        // Let SwiftUI finish its first layout and any on-appear animations
+        // (the card turning over, the winning score ticking up).
+        RunLoop.main.run(until: Date().addingTimeInterval(Self.settleTime))
 
         let format = UIGraphicsImageRendererFormat()
         format.scale = 2
@@ -93,10 +97,10 @@ final class ScreenSnapshotTests: XCTestCase {
         try render("05-reveal-team1") { GameView(session: s) }
 
         let word = s.round.card(for: s.teams[0].players.first { !s.round.isEcho($0) }!)
-        try render("06-card-word") { CardView(name: "Bea", card: word) {} }
-        try render("07-card-echo") { CardView(name: "Alex", card: .echo(themeName: "Pirate")) {} }
-        try render("08-card-echo-none") { CardView(name: "Alex", card: .echo(themeName: nil)) {} }
-        try render("06-card-word", dark: true) { CardView(name: "Bea", card: word) {} }
+        try render("06-card-word") { CardView(name: "Bea", card: word, accent: Style.team1) {} }
+        try render("07-card-echo") { CardView(name: "Alex", card: .echo(themeName: "Pirate"), accent: Style.team1) {} }
+        try render("08-card-echo-none") { CardView(name: "Alex", card: .echo(themeName: nil), accent: Style.team2) {} }
+        try render("06-card-word", dark: true) { CardView(name: "Bea", card: word, accent: Style.team1) {} }
 
         s.markRevealed(s.teams[0].players[0])
         try render("09-reveal-partial") { GameView(session: s) }
@@ -105,10 +109,14 @@ final class ScreenSnapshotTests: XCTestCase {
         s.nextHint()
         try render("11-hint-2") { GameView(session: s) }
         try render("11-hint-2", dark: true) { GameView(session: s) }
+        for _ in 1..<GameRules.hintsBeforeShowdown { s.nextHint() }
+        try render("11b-showdown") { GameView(session: s) }
         s.exitRound()
         try render("12-who-said-it") { GameView(session: s) }
+        try render("12-who-said-it", dark: true) { GameView(session: s) }
         s.recordWinner(0)
         try render("13-results") { GameView(session: s) }
+        try render("13-results", dark: true) { GameView(session: s) }
     }
 
     /// Worst case for the screens that don't scroll: 20 players with
@@ -123,10 +131,12 @@ final class ScreenSnapshotTests: XCTestCase {
 
         try render("20-stress-home", textSize: big) { HomeView() }
         try render("21-stress-reveal", textSize: big) { GameView(session: s) }
-        try render("22-stress-card-echo", textSize: big) { CardView(name: names[0], card: .echo(themeName: "Movies & TV")) {} }
-        try render("23-stress-card-word", textSize: big) { CardView(name: names[0], card: .word("tug of war")) {} }
+        try render("22-stress-card-echo", textSize: big) { CardView(name: names[0], card: .echo(themeName: "Movies & TV"), accent: Style.team2) {} }
+        try render("23-stress-card-word", textSize: big) { CardView(name: names[0], card: .word("tug of war"), accent: Style.team1) {} }
         for p in s.teams.flatMap(\.players) { s.markRevealed(p) }
         try render("24-stress-hint", textSize: big) { GameView(session: s) }
+        for _ in 0..<GameRules.hintsBeforeShowdown { s.nextHint() }
+        try render("24b-stress-showdown", textSize: big) { GameView(session: s) }
         s.exitRound()
         try render("25-stress-who-said-it", textSize: big) { GameView(session: s) }
         s.recordWinner(1)
