@@ -65,7 +65,7 @@ struct SetupView: View {
             .disabled(partyName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Saves these \(players.count) names so you can pick them next time. Teams are still split fresh each game.")
+            Text("Saves these \(players.count) names for next time.")
         }
     }
 
@@ -81,7 +81,7 @@ struct SetupView: View {
         let n = players.count
         if n < GameRules.minPlayers {
             let more = GameRules.minPlayers - n
-            return "\(n) \(n == 1 ? "player" : "players"). Add \(more) more to start."
+            return "Add \(more) more to start."
         }
         return "\(n) players"
     }
@@ -120,7 +120,7 @@ struct SetupView: View {
                     .foregroundStyle(Style.muted)
                     .padding(.horizontal, Style.hairGap)
             } else if isFull {
-                Text("That's the maximum of \(GameRules.maxPlayers) players.")
+                Text("\(GameRules.maxPlayers) players max.")
                     .font(Style.caption)
                     .foregroundStyle(Style.muted)
                     .padding(.horizontal, Style.hairGap)

@@ -294,4 +294,17 @@ final class GameEngineTests: XCTestCase {
         store.selectedID = "none"
         XCTAssertEqual(ThemeStore(themes: themes, defaults: defaults).selectedID, "none")
     }
+
+    func testShowdownStartsAfterHintLimit() {
+        let session = GameSession(
+            players: ["Ana", "Ben", "Cy", "Di"].map { Player(name: $0) },
+            theme: theme,
+            rng: SeededRNG(seed: 1)
+        )
+        for p in session.teams.flatMap(\.players) { session.markRevealed(p) }
+        for _ in 1..<GameRules.hintsBeforeShowdown { session.nextHint() }
+        XCTAssertFalse(session.currentHint.isShowdown, "Hint 10 is still a normal hint")
+        session.nextHint()
+        XCTAssertTrue(session.currentHint.isShowdown, "Hint 11 starts the showdown")
+    }
 }

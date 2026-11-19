@@ -48,6 +48,7 @@ A party game on one iPhone.
 
 - Hints are spoken, so the players decide what counts as "too close" to the word.
 - Each Echo gets up to 2 guesses per hint. Once both Echos have passed or used their guesses, the next hint is given and the guesses reset. The app doesn't count guesses; the phone holder just taps Done or Exit.
+- Showdown: after 10 hints, both Echos keep guessing until one of them runs out of guesses. The hint screen says so from hint 11 on.
 - An odd number of players is fine. The bigger team cycles through more hinters.
 - After Exit, the app asks which team's Echo said the word and keeps a running score. "Play again with the same teams" picks a new word and new Echos.
 - Saved parties are just lists of names. Teams are split fresh every game.

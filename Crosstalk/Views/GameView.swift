@@ -60,7 +60,7 @@ struct GameView: View {
             Button("End game", role: .destructive) { app.goHome() }
             Button("Keep playing", role: .cancel) {}
         } message: {
-            Text("The score for this game will be lost.")
+            Text("The score will be lost.")
         }
     }
 
@@ -112,7 +112,7 @@ struct RevealView: View {
                 Text(team.name)
                     .font(Style.title)
                     .foregroundStyle(teamColor)
-                Text("Pass the phone around. Tap your name to see your card.")
+                Text("Tap your name to see your card.")
                     .font(Style.caption)
                     .foregroundStyle(Style.muted)
                     .multilineTextAlignment(.center)
@@ -195,20 +195,15 @@ struct CardView: View {
                 front
                     .cardBox(accent: accent)
             } back: {
-                // Same size as the front, without drawing it.
+                // Blank, and the same size as the front.
                 front
                     .hidden()
-                    .overlay(
-                        Text("Crosstalk")
-                            .font(Style.title)
-                            .foregroundStyle(accent)
-                    )
                     .cardBox(accent: accent)
             }
 
             Spacer()
 
-            Text("Remember it, then hide it and pass the phone on.")
+            Text("Hide it, then pass the phone on.")
                 .font(Style.caption)
                 .foregroundStyle(Style.muted)
                 .multilineTextAlignment(.center)
@@ -254,7 +249,7 @@ struct CardView: View {
                         .foregroundStyle(accent)
                         .multilineTextAlignment(.center)
                         .minimumScaleFactor(0.5)
-                    Text(themeName.map { "Theme: \($0)" } ?? "No theme. Good luck.")
+                    Text(themeName.map { "Theme: \($0)" } ?? "No theme")
                         .font(Style.body)
                 }
             }
@@ -367,13 +362,16 @@ struct HintView: View {
             Spacer()
 
             VStack(alignment: .leading, spacing: Style.tightGap) {
-                Text("Then guessing")
+                Text(turn.isShowdown ? "Showdown" : "Guessing")
                     .font(Style.headline)
                 guessLine("First", echo: round.echo(of: otherTeam), team: otherTeam)
-                guessLine("If they pass", echo: round.echo(of: turn.team), team: turn.team)
-                Text("Up to \(GameRules.guessesPerEcho) guesses each.")
-                    .font(Style.caption)
-                    .foregroundStyle(Style.muted)
+                guessLine("Then", echo: round.echo(of: turn.team), team: turn.team)
+                Text(turn.isShowdown
+                     ? "Both Echos guess until one runs out of guesses."
+                     : "\(GameRules.guessesPerEcho) guesses each.")
+                    .font(turn.isShowdown ? Style.captionStrong : Style.caption)
+                    .foregroundStyle(turn.isShowdown ? Style.ink : Style.muted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .box(filled: false)
@@ -381,10 +379,10 @@ struct HintView: View {
 
             Button("Next hint", action: nextHint)
                 .buttonStyle(.primaryBox)
-                .accessibilityHint("No one got it. Go to the next hint.")
+                .accessibilityHint("No one got it.")
             Button("Echo got it") { session.exitRound() }
                 .buttonStyle(.secondaryBox)
-                .accessibilityHint("An Echo said the word. Ends the round.")
+                .accessibilityHint("Ends the round.")
                 .padding(.bottom, Style.gap)
         }
         .animation(reduceMotion ? Style.fade : Style.push, value: turn.number)
@@ -408,9 +406,6 @@ struct WinnerView: View {
             Spacer()
             Text("Who said it?")
                 .font(Style.title)
-            Text("Tap the team whose Echo said the word.")
-                .font(Style.caption)
-                .foregroundStyle(Style.muted)
             Spacer()
 
             ForEach(session.teams) { team in
@@ -460,7 +455,7 @@ struct ResultsView: View {
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.5)
                     .lineLimit(2)
-                Text(winner.map { "\(session.teams[$0].name) wins the round" } ?? "No one got it")
+                Text(winner.map { "\(session.teams[$0].name) wins" } ?? "No one got it")
                     .font(Style.headline)
                     .foregroundStyle(winner.map(Style.team) ?? Style.ink)
             }
@@ -490,7 +485,7 @@ struct ResultsView: View {
 
             Spacer()
 
-            Button("Play again with the same teams", action: onPlayAgain)
+            Button("Play again", action: onPlayAgain)
                 .buttonStyle(.primaryBox)
             Button("Home", action: onHome)
                 .buttonStyle(.secondaryBox)

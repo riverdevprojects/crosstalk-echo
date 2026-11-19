@@ -41,7 +41,7 @@ private struct ThemeRow: View {
                 Text(theme.name).font(Style.headline)
                 Text(theme.showsNameToEcho
                      ? "\(theme.cleanWords.count) words"
-                     : "Any word. The Echo isn't told the theme.")
+                     : "Any word. No theme for the Echo.")
                     .font(Style.caption)
                     .foregroundStyle(Style.muted)
             }
