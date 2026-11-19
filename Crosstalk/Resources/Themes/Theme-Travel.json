@@ -1,0 +1,33 @@
+{
+  "id": "travel",
+  "name": "Travel",
+  "order": 6,
+  "showsNameToEcho": true,
+  "words": [
+    "airplane", "airport", "pilot", "flight", "runway", "terminal", "gate", "boarding pass", "passport", "visa",
+    "ticket", "seat", "window seat", "aisle", "tray table", "seatbelt", "carry-on", "luggage", "suitcase", "backpack",
+    "duffel", "baggage claim", "conveyor belt", "security", "customs", "border", "jet lag", "layover", "delay", "departure",
+    "arrival", "takeoff", "landing", "turbulence", "flight attendant", "cockpit", "wing", "jet", "helicopter", "hot air balloon",
+    "train", "station", "platform", "subway", "tram", "trolley", "bus", "bus stop", "taxi", "cab",
+    "car", "rental car", "road trip", "highway", "map", "gps", "compass", "detour", "traffic", "toll",
+    "gas station", "rest stop", "motel", "hotel", "hostel", "resort", "cabin", "campsite", "tent", "sleeping bag",
+    "rv", "trailer", "cruise", "ship", "ferry", "boat", "sailboat", "port", "harbor", "dock",
+    "beach", "ocean", "island", "coast", "lighthouse", "pier", "boardwalk", "mountain", "volcano", "glacier",
+    "canyon", "desert", "jungle", "rainforest", "waterfall", "lake", "river", "valley", "cave", "forest",
+    "city", "town", "village", "capital", "skyline", "skyscraper", "landmark", "monument", "statue", "castle",
+    "palace", "temple", "cathedral", "museum", "gallery", "zoo", "aquarium", "theme park", "roller coaster", "ferris wheel",
+    "market", "bazaar", "souvenir", "postcard", "stamp", "gift shop", "keychain", "magnet", "t-shirt", "snow globe",
+    "camera", "photo", "selfie", "selfie stick", "album", "guidebook", "brochure", "tour", "tour guide", "tourist",
+    "sightseeing", "itinerary", "reservation", "booking", "check-in", "checkout", "lobby", "front desk", "room key", "room service",
+    "minibar", "pool", "spa", "hot tub", "balcony", "view", "bellhop", "concierge", "housekeeping", "wake-up call",
+    "vacation", "holiday", "honeymoon", "getaway", "weekend", "adventure", "expedition", "journey", "trip", "voyage",
+    "backpacker", "explorer", "traveler", "nomad", "local", "foreigner", "language", "translator", "phrasebook", "accent",
+    "currency", "exchange", "wallet", "cash", "credit card", "budget", "receipt", "tip", "price", "bargain",
+    "sunscreen", "sunglasses", "hat", "flip-flops", "swimsuit", "towel", "umbrella", "raincoat", "jacket", "boots",
+    "toothbrush", "toiletries", "charger", "adapter", "pillow", "neck pillow", "blanket", "earplugs", "eye mask", "snacks",
+    "water bottle", "first aid", "insurance", "embassy", "time zone", "jet ski", "snorkel", "scuba", "surfboard", "ski lodge",
+    "chairlift", "trail", "hike", "summit", "camp", "campfire", "picnic", "sunrise", "sunset", "flag",
+    "country", "continent", "equator", "north pole", "globe", "atlas", "latitude", "longitude", "airport lounge", "duty free",
+    "first class", "economy", "upgrade", "frequent flyer", "miles", "passport photo", "tan"
+  ]
+}

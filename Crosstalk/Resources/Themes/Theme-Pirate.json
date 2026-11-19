@@ -1,0 +1,28 @@
+{
+  "id": "pirate",
+  "name": "Pirate",
+  "order": 1,
+  "showsNameToEcho": true,
+  "words": [
+    "parrot", "cannon", "ship", "treasure", "map", "anchor", "sword", "plank",
+    "captain", "flag", "island", "compass", "barrel", "hook", "eyepatch", "telescope",
+    "chest", "gold", "coin", "jewel", "skull", "sail", "mast", "deck",
+    "cabin", "crew", "storm", "wave", "shark", "mermaid", "cannonball", "rope",
+    "knot", "harbor", "lighthouse", "shipwreck", "cave", "beach", "palm", "sea",
+    "lantern", "bottle", "pistol", "dagger", "boot", "hat", "beard", "mutiny",
+    "kraken", "seagull", "rowboat", "pearl", "ruby", "diamond", "crown", "necklace",
+    "ring", "earring", "bandana", "sash", "belt", "buckle", "coat", "feather",
+    "pegleg", "crutch", "monkey", "rat", "crab", "octopus", "whale", "dolphin",
+    "turtle", "fish", "net", "bucket", "mop", "broom", "ladder", "hammock",
+    "cook", "stew", "biscuit", "lime", "coconut", "banana", "water", "plunder",
+    "wheel", "rudder", "oar", "cargo", "crate", "sack", "spyglass", "lookout",
+    "nest", "rigging", "hull", "chain", "lock", "key", "jail", "prisoner",
+    "sailor", "navy", "admiral", "governor", "port", "dock", "pier", "tavern",
+    "song", "fiddle", "drum", "dice", "cards", "bet", "fortune", "legend",
+    "ghost", "curse", "skeleton", "bones", "fog", "wind", "thunder", "lightning",
+    "sunset", "moon", "star", "horizon", "current", "tide", "reef", "sand",
+    "shovel", "pickaxe", "torch", "candle", "letter", "message", "clue", "riddle",
+    "scar", "tattoo", "voyage", "adventure", "battle", "enemy", "bounty", "reward",
+    "raft", "lagoon", "jungle", "volcano"
+  ]
+}

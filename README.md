@@ -29,6 +29,7 @@ A party game on one iPhone.
 ## Themes
 
 - Change Theme sets the word pool. Pirate theme = parrot, cannon, ship, etc.
+- Launch themes: None, Pirate, Animals, Food & Drink, Sports, Movies & TV, Travel.
 - None = fully random word. Hard mode, because the Echo doesn't even get a theme.
 
 ## UI
@@ -42,3 +43,72 @@ A party game on one iPhone.
 
 - Backwards compatible with basically every iPhone, within reason - must run on iPhone 8 and newer (iOS 16+).
 - One phone, passed around. No accounts, no internet required to play.
+
+## House Rules
+
+- Hints are spoken, so the players decide what counts as "too close" to the word.
+- Each Echo gets up to 2 guesses per hint. Once both Echos have passed or used their guesses, the next hint is given and the guesses reset. The app doesn't count guesses; the phone holder just taps Done or Exit.
+- An odd number of players is fine. The bigger team cycles through more hinters.
+- After Exit, the app asks which team's Echo said the word and keeps a running score. "Play again with the same teams" picks a new word and new Echos.
+- Saved parties are just lists of names. Teams are split fresh every game.
+- 4 to 20 players.
+
+## Development
+
+Open `Crosstalk.xcodeproj` in Xcode 16 or newer, set your signing team on the Crosstalk target, and run. No dependencies.
+
+```
+Crosstalk/
+  CrosstalkApp.swift        App entry and top-level screen switching
+  Model/                    Game rules and state (no UI code)
+    GameEngine.swift        Teams, Echo picks, word picks, hint order
+    GameSession.swift       One sitting: phases, score, play again
+    ThemeStore.swift        Loads word lists, remembers the selected theme
+    PartyTemplateStore.swift Saved name lists
+  Style/Style.swift         Every font, color, radius and spacing value
+  Views/                    One file per screen
+  Resources/Themes/         Word lists (Theme-*.json)
+CrosstalkTests/             Unit tests for the model
+```
+
+**Restyling.** All visual values live in `Style/Style.swift`. Views use `Style.title`, `.box()`, `.primaryBox` and so on rather than raw values, so changing the look is mostly a one-file job.
+
+**Adding a theme.** Add a file named `Theme-Whatever.json` to `Crosstalk/Resources/Themes/`. It appears in Change Theme automatically; no code changes.
+
+```json
+{
+  "id": "space",
+  "name": "Space",
+  "order": 2,
+  "showsNameToEcho": true,
+  "words": ["rocket", "planet", "comet"]
+}
+```
+
+`order` sets its position in the list. `showsNameToEcho: false` hides the theme name from the Echo; that's how None works.
+
+After editing a word list, run `powershell -File tools/check-themes.ps1` (Windows) or `pwsh tools/check-themes.ps1` (Mac). It prints each theme's word count and flags duplicates. Add `-Fix` to remove duplicates and lowercase everything automatically. The unit tests check the same rules.
+
+Launch themes and word counts:
+
+| Theme | Words |
+|---|---|
+| None | 1,134 |
+| Food & Drink | 371 |
+| Animals | 266 |
+| Sports | 265 |
+| Travel | 247 |
+| Movies & TV | 230 |
+| Pirate | 156 |
+
+Every theme aims for about 1,000 words but stops where it would need obscure words. Only None reaches 1,000.
+
+**App icon.** `tools/make-icon.ps1` draws the placeholder icon (one speech bubble on a neutral background). Replace `Crosstalk/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png` with any 1024×1024 PNG without transparency; Xcode generates every other size.
+
+**Tests.** Product > Test in Xcode, or:
+
+```
+xcodebuild test -project Crosstalk.xcodeproj -scheme Crosstalk -destination 'platform=iOS Simulator,name=iPhone 16'
+```
+
+CI runs the same tests on every pull request.
