@@ -153,7 +153,7 @@ struct SetupView: View {
                     .box(filled: false)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
                 .contextMenu {
                     Button(role: .destructive) {
                         templates.delete(template)

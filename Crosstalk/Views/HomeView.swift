@@ -48,7 +48,7 @@ struct RulesView: View {
         Rule("Too close", "A hint can't be too close to the word. You're the judges: if the table says it's too close, it doesn't count."),
         Rule("Guessing", "After a hint, the other team's Echo guesses first. If they pass, the hinting team's Echo guesses. Each Echo gets up to two guesses per hint."),
         Rule("Winning", "The first Echo to say the word wins the round."),
-        Rule("The phone", "Whoever holds the phone taps Done after each hint, or Exit when an Echo gets the word."),
+        Rule("The phone", "Whoever holds the phone taps Next hint after each hint, or Echo got it when an Echo says the word."),
     ]
 
     var body: some View {

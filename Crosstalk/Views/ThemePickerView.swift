@@ -21,7 +21,7 @@ struct ThemePickerView: View {
                         } label: {
                             ThemeRow(theme: theme, isSelected: theme.id == themes.selectedID)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.row)
                     }
                 }
                 .padding(.bottom, Style.screenMargin)
