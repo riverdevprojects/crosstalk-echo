@@ -44,27 +44,46 @@ final class AppModel: ObservableObject {
 
 struct RootView: View {
     @EnvironmentObject private var app: AppModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.layoutDirection) private var layoutDirection
+    @State private var direction = PushDirection()
+
+    /// Position in the flow: Home, then Change Theme or Players, then the game.
+    private static func depth(_ screen: AppModel.Screen) -> Int {
+        switch screen {
+        case .home: return 0
+        case .themes, .setup: return 1
+        case .game: return 2
+        }
+    }
 
     var body: some View {
+        let _ = direction.update(to: app.screen, layoutDirection: layoutDirection) {
+            Self.depth($1) < Self.depth($0)
+        }
+
         ZStack {
-            switch app.screen {
-            case .home:
-                HomeView()
-            case .themes:
-                ThemePickerView()
-            case .setup:
-                SetupView()
-            case .game:
-                if let session = app.session {
-                    GameView(session: session)
+            Group {
+                switch app.screen {
+                case .home:
+                    HomeView()
+                case .themes:
+                    ThemePickerView()
+                case .setup:
+                    SetupView()
+                case .game:
+                    if let session = app.session {
+                        GameView(session: session)
+                    }
                 }
             }
+            .transition(Style.screenTransition(direction, reduceMotion: reduceMotion))
         }
         .settlesAfterChange(of: app.screen)
-        .animation(Style.fade, value: app.screen)
+        .animation(reduceMotion ? Style.fade : Style.push, value: app.screen)
         // Text still scales with the user's setting, up to the largest
         // standard size. The accessibility sizes beyond that would push the
-        // Done/Exit buttons off the fixed-height game screens.
+        // Next hint / Echo got it buttons off the fixed-height game screens.
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 }
